@@ -22,9 +22,21 @@ class CRM_Volunteeractivities_Page_VolunteerActivities extends CRM_Core_Page {
   }
 
   private function getVolunteerActivities($contact) {
+    $volunteerActivityTypes = civicrm_api3("OptionValue", 'get', array(
+      "option_group_id.name" => 'activity_type',
+      "name"                 => array('IN' => array('Volunteer', 'volunteer_commendation')),
+      "sequential"           => 1,
+    ));
+
+    $volunteerActivityTypeIds = array();
+    foreach ($volunteerActivityTypes["values"] as $volunteerActivityType) {
+      $volunteerActivityTypeIds[] = $volunteerActivityType["value"];
+    }
+
     $activities = civicrm_api3("ActivityContact", 'get', array(
-      "contact_id"     => $contact["id"],
-      'return'         => array(
+      "contact_id"       => $contact["id"],
+      'activity_id.activity_type_id' => array('IN' => $volunteerActivityTypeIds),
+      'return'           => array(
         "activity_id.activity_date_time",
         "activity_id.subject",
         "activity_id.campaign_id.title",
