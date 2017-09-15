@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<extension key="au.com.agileware.volunteeractivities" type="module">
+  <file>volunteeractivities</file>
+  <name>Volunteer Activities</name>
+  <description>A extension which shows the volunteer activities on contact page. This extension works only if CiviVolunteer extension is installed and enabled.</description>
+  <license>AGPL-3.0</license>
+  <maintainer>
+    <author>Agileware</author>
+    <email>info@agileware.com.au</email>
+  </maintainer>
+  <urls>
+    <url desc="Main Extension Page">http://FIXME</url>
+    <url desc="Documentation">http://FIXME</url>
+    <url desc="Support">http://FIXME</url>
+    <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
+  </urls>
+  <releaseDate>2017-09-12</releaseDate>
+  <version>1.0</version>
+  <develStage>alpha</develStage>
+  <compatibility>
+    <ver>4.7</ver>
+  </compatibility>
+  <civix>
+    <namespace>CRM/Volunteeractivities</namespace>
+  </civix>
+</extension>
