@@ -6,4 +6,9 @@
     <title>VolunteerActivities</title>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
+  <item>
+    <path>civicrm/ajax/volunteeractivity</path>
+    <page_callback>CRM_Volunteeractivities_Page_AJAX::getVolunteerActivities</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
 </menu>
