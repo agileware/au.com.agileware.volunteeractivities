@@ -8,9 +8,7 @@ class CRM_Volunteeractivities_Page_AJAX extends CRM_Core_Page {
       'cid' => 'Integer',
     );
 
-    $optionalParameters = array(
-
-    );
+    $optionalParameters = array();
     $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
     $params += CRM_Core_Page_AJAX::validateParams($requiredParameters, $optionalParameters);
     $params['contact_id'] = $params['cid'];
@@ -24,15 +22,16 @@ class CRM_Volunteeractivities_Page_AJAX extends CRM_Core_Page {
       $this, FALSE, 25
     );
 
-    $activities = self::filterVolunteerActivities($contact,$params);
+    $activities = self::filterVolunteerActivities($contact, $params);
     CRM_Utils_JSON::output(array(
       "data"         => $activities["records"],
       "recordsTotal" => $activities["total"],
       "recordsFiltered" => $activities["total"],
     ));
+
   }
 
-  private static function filterVolunteerActivities($contact,$params) {
+  private static function filterVolunteerActivities($contact, $params) {
     $volunteerActivityTypes = civicrm_api3("OptionValue", 'get', array(
       "option_group_id.name" => 'activity_type',
       "name"                 => array('IN' => array('Volunteer', 'volunteer_commendation')),
@@ -83,7 +82,7 @@ class CRM_Volunteeractivities_Page_AJAX extends CRM_Core_Page {
     $activities = self::formatActivityValues($activities);
     return array(
       "records" => $activities,
-      "total"   => $activitiescount
+      "total"   => $activitiescount,
     );
   }
 
