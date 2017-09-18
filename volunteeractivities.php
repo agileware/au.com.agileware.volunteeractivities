@@ -143,9 +143,11 @@ function _volunteerActivities_prereqCheck() {
  */
 function volunteeractivities_civicrm_tabset($tabsetName, &$tabs, $context) {
   if ($tabsetName == "civicrm/contact/view") {
-    $tab['volunteeractivities'] = array(
+    $tab[count($tabs)] = array(
       'title' => ts('Volunteer Activities'),
-      'url' => CRM_Utils_System::url('civicrm/contact/view/volunteeractivities', 'cid=' . $context['contact_id']),
+      'id'  => 'volunteeractivity',
+      'url' => CRM_Utils_System::url('civicrm/contact/view/volunteeractivities', 'reset=1&cid=' . $context['contact_id']),
+      'class' => 'livePage',
     );
     $tabs = array_merge(array_slice($tabs, 0, 5), $tab, array_slice($tabs, 5));
   }

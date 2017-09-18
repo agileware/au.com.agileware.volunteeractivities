@@ -35,9 +35,14 @@ class CRM_Volunteeractivities_Page_VolunteerActivities extends CRM_Core_Page {
         "key"   => "status",
         "title" => "Status",
       ),
+      array(
+        "key"   => "links",
+        "title" => "",
+      ),
     );
-    $this->assign('contactId',$contact["id"]);
+    $this->assign('contactId', $contact["id"]);
     $this->assign('columnHeaders', $columnHeaders);
     parent::run();
   }
+
 }

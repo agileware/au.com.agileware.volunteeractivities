@@ -53,6 +53,8 @@ class CRM_Volunteeractivities_Page_AJAX extends CRM_Core_Page {
         "activity_id.location",
         "activity_id.status_id",
         "activity_id",
+        "activity_id.activity_type_id",
+        "activity_id.source_record_id",
       ),
       "api.OptionValue.get.activity_status" => array(
         'value' => "\$value.activity_id.status_id",
@@ -79,19 +81,29 @@ class CRM_Volunteeractivities_Page_AJAX extends CRM_Core_Page {
     $activities = civicrm_api3("ActivityContact", 'get', $params);
     unset($params["options"]);
     $activitiescount = civicrm_api3("ActivityContact", 'getcount', $params);
-    $activities = self::formatActivityValues($activities);
+    $activities = self::formatActivityValues($activities, $contact["id"]);
     return array(
       "records" => $activities,
       "total"   => $activitiescount,
     );
   }
 
-  private static function formatActivityValues($activities) {
+  private static function formatActivityValues($activities, $contactid) {
     $formattdActivities = array();
     if ($activities["count"] == 0) {
       return $formattdActivities;
     }
     $activities = $activities["values"];
+
+    $page = new CRM_Core_Page();
+    CRM_Contact_Page_View::checkUserPermission($page, $contactid);
+    $permissions = array($page->_permission);
+    if (CRM_Core_Permission::check('delete activities')) {
+      $permissions[] = CRM_Core_Permission::DELETE;
+    }
+
+    $mask = CRM_Core_Action::mask($permissions);
+
     foreach ($activities as $activity) {
       $formattedActivity = array(
         "datetime" => $activity["activity_id.activity_date_time"],
@@ -99,10 +111,38 @@ class CRM_Volunteeractivities_Page_AJAX extends CRM_Core_Page {
         "id"       => $activity["activity_id"],
       );
       self::formatExtraFields($activity, $formattedActivity);
+      self::addActivityLinks($activity, $contactid, $formattedActivity);
       $formattedActivity['datetime'] = CRM_Utils_Date::customFormat($formattedActivity['datetime']);
       $formattdActivities[] = $formattedActivity;
     }
     return $formattdActivities;
+  }
+
+  private static function addActivityLinks($activity, $contactid, &$formattedActivity) {
+    $formattedActivity['links'] = '';
+    $accessMailingReport = FALSE;
+
+    $actionLinks = CRM_Activity_Selector_Activity::actionLinks(
+      CRM_Utils_Array::value('activity_id.activity_type_id', $activity),
+      CRM_Utils_Array::value('activity_id.source_record_id', $values),
+      $accessMailingReport,
+      CRM_Utils_Array::value('activity_id', $activity)
+    );
+
+    $actionMask = array_sum(array_keys($actionLinks)) & $mask;
+
+    $formattedActivity['links'] = CRM_Core_Action::formLink($actionLinks,
+      $actionMask,
+      array(
+        'id' => $activity['activity_id'],
+        'cid' => $contactid,
+      ),
+      ts('more'),
+      FALSE,
+      'activity.tab.row',
+      'Activity',
+      $activity['activity_id']
+    );
   }
 
   private static function formatExtraFields($activity, &$formattedActivity) {
