@@ -3,6 +3,10 @@ use CRM_Volunteeractivities_ExtensionUtil as E;
 
 class CRM_Volunteeractivities_Page_AJAX extends CRM_Core_Page {
 
+  /**
+   * Static function to fetch the volunteer activities for Datatable.
+   * @output json string of activities.
+   */
   public static function getVolunteerActivities() {
     $requiredParameters = array(
       'cid' => 'Integer',
@@ -31,6 +35,15 @@ class CRM_Volunteeractivities_Page_AJAX extends CRM_Core_Page {
 
   }
 
+  /**
+   * Function to filter the volunteer activities of particular contact with given params from the Datatables.
+   * @param
+   * $contact
+   *   Conatact of which volunteer activities needs to fetch.
+   * $params
+   *   Parameters from datatables to get the length and start position of the result set.
+   * @return array with filtered records and total count of activities.
+   */
   private static function filterVolunteerActivities($contact, $params) {
     $volunteerActivityTypes = civicrm_api3("OptionValue", 'get', array(
       "option_group_id.name" => 'activity_type',
@@ -88,6 +101,15 @@ class CRM_Volunteeractivities_Page_AJAX extends CRM_Core_Page {
     );
   }
 
+  /**
+   * This function formats the values of filtered activities.
+   * @param
+   * $activities
+   *   Filtered activities from filterVolunteerActivities() function.
+   * $contactid
+   *   Contact ID for which activities are getting fetched.
+   * @return formatted activities with required format by datatables on Frontend.
+   */
   private static function formatActivityValues($activities, $contactid) {
     $formattdActivities = array();
     if ($activities["count"] == 0) {
@@ -118,6 +140,17 @@ class CRM_Volunteeractivities_Page_AJAX extends CRM_Core_Page {
     return $formattdActivities;
   }
 
+  /**
+   * This function adds Operation links for each activity.
+   * Operation links suuch as View, Edit & Delete.
+   * @param
+   * $activity
+   *    Fetched activity array from database. We need this to get basic activity details e.g. activity_type_id, activity_id etc...
+   * $contactid
+   *    Contact ID for which activities are gettiing fetched.
+   * $formattedActivity
+   *    Reference to the formatted activity array to directly add the links into the array.
+   */
   private static function addActivityLinks($activity, $contactid, &$formattedActivity) {
     $formattedActivity['links'] = '';
     $accessMailingReport = FALSE;
@@ -145,6 +178,14 @@ class CRM_Volunteeractivities_Page_AJAX extends CRM_Core_Page {
     );
   }
 
+  /**
+   * A wrapper function to call all the formating functions.
+   * @param
+   * $activity
+   *    Original activity array fetched from database. We need this to match the current data.
+   * $formattedActivity
+   *    Reference to the formatted activity to manipulate the data directly into the array.
+   */
   private static function formatExtraFields($activity, &$formattedActivity) {
     self::saveValueIfExists("activity_id.campaign_id.title", "campaign_name", $activity, $formattedActivity);
     self::saveValueIfExists("activity_id.location", "location", $activity, $formattedActivity);
@@ -153,6 +194,14 @@ class CRM_Volunteeractivities_Page_AJAX extends CRM_Core_Page {
     self::saveActivitySupervisor($activity, $formattedActivity);
   }
 
+  /**
+   * A function to get the supervisor(with-contact) of the activity. If none is found we set it to blank.
+   * @param
+   * $activity
+   *    Original activity array fetched from database. We need this to match the current data.
+   * $formattedActivity
+   *    Reference to the formatted activity to add the data directly into the array.
+   */
   private static function saveActivitySupervisor($activity, &$formattedActivity) {
     $activitiesSupervisor = civicrm_api3("ActivityContact", 'get', array(
         "activity_id"             => $formattedActivity["id"],
@@ -168,6 +217,14 @@ class CRM_Volunteeractivities_Page_AJAX extends CRM_Core_Page {
     }
   }
 
+  /**
+   * A function to save the volunteer role of the contact for particular activity. If none is found we set it to blank.
+   * @param
+   * $activity
+   *    Original activity array fetched from database. We need this to match the current data.
+   * $formattedActivity
+   *    Reference to the formatted activity to add the data directly into the array.
+   */
   private static function saveVolunteerRole($activity, &$formattedActivity) {
     $formattedActivity["volunteer_role"] = "";
     if ($activity["api.OptionValue.get.volunteer_role"]["count"] > 0) {
@@ -175,6 +232,14 @@ class CRM_Volunteeractivities_Page_AJAX extends CRM_Core_Page {
     }
   }
 
+  /**
+   * A function to save the activity status. If none is found we set it to blank.
+   * @param
+   * $activity
+   *    Original activity array fetched from database. We need this to match the current data.
+   * $formattedActivity
+   *    Reference to the formatted activity to add the data directly into the array.
+   */
   private static function saveActivityStatus($activity, &$formattedActivity) {
     $formattedActivity["status"] = "";
     if ($activity["api.OptionValue.get.activity_status"]["count"] > 0) {
@@ -182,6 +247,18 @@ class CRM_Volunteeractivities_Page_AJAX extends CRM_Core_Page {
     }
   }
 
+  /**
+   * A function to save the particular value from the array into formatted activity. If none is found we set it to blank.
+   * @param
+   * $sourcekey
+   *    Key for which we want to find the value.
+   * $destinationkey
+   *    Key by which we want to save the value in formatted array.
+   * $sourceArray
+   *    Array from which we want to fetch the value.
+   * $destinationArray
+   *   Reference to the destination array to save the data directly into the array.
+   */
   private static function saveValueIfExists($sourcekey, $destinationkey, $sourceArray, &$destinationArray) {
     $destinationArray[$destinationkey] = "";
     if (array_key_exists($sourcekey, $sourceArray)) {
@@ -189,6 +266,10 @@ class CRM_Volunteeractivities_Page_AJAX extends CRM_Core_Page {
     }
   }
 
+  /**
+   * A function to validate the given contact by given cid(Contact ID)
+   * @return Exception|Contact Array
+   */
   public static function validateContact() {
     $contact_id = CRM_Utils_Request::retrieve('cid', 'Positive',
       $this, FALSE, 0
