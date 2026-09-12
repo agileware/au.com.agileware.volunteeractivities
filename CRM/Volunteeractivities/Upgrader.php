@@ -4,7 +4,7 @@ use CRM_Volunteeractivities_ExtensionUtil as E;
 /**
  * Collection of upgrade steps.
  */
-class CRM_Volunteeractivities_Upgrader extends CRM_Volunteeractivities_Upgrader_Base {
+class CRM_Volunteeractivities_Upgrader extends CRM_Extension_Upgrader_Base {
   /**
    * Extension Dependency Check
    *
