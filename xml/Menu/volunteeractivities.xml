@@ -10,5 +10,6 @@
     <path>civicrm/ajax/volunteeractivity</path>
     <page_callback>CRM_Volunteeractivities_Page_AJAX::getVolunteerActivities</page_callback>
     <access_arguments>access CiviCRM</access_arguments>
+    <is_ajax>true</is_ajax>
   </item>
 </menu>
